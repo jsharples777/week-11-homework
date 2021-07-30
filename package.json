@@ -6,9 +6,11 @@
   "scripts": {
     "start": "node index.js",
     "tsc": "tsc",
-    "watch": "babel --verbose --watch src --out-dir lib --extensions '.ts,.tsx'",
-    "build": "babel src --out-dir lib --extensions '.ts,.tsx'",
-    "test": "jest"
+    "watch": "babel --verbose --watch src --out-dir lib --extensions '.js,.ts,.tsx'",
+    "build": "babel src --out-dir lib --extensions '.js,.ts,.tsx'",
+    "test": "jest",
+    "renderEmployees": "node ./lib/render/test/EmployeeRendererTest.js",
+    "renderPage": "node ./lib/render/test/PageRendererTest.js"
   },
   "author": "Jim Sharples",
   "license": "ISC",

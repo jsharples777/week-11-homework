@@ -1,94 +1,27 @@
+const {Manager} = require("./lib/model/Manager");
+const {Engineer} = require("./lib/model/Engineer");
+const {Intern} = require("./lib/model/Intern");
+const {PageRenderer} = require("./lib/render/PageRenderer");
+
 const inquirer = require('inquirer');
 const fs = require('fs');
 const moment = require('moment');
 
-class MarkdownRenderer {
+class HTMLRenderer {
     constructor(showLog = false) {
         this.showLog = showLog;
         this.render = this.render.bind(this);
     }
 
-    render(answers) {
+    render(employees) {
         if (this.showLog) {
-            console.log(`Markdown Renderer: starting markdown generation with answers:`);
-            console.log(answers);
+            console.log(`HTML Renderer: starting html generation with employees:`);
+            console.log(employees);
         }
-        let buffer = "";
-        let tableOfContentsBuffer = "\r\n# Table of Contents\r\n";
-
-        // add the title
-        buffer += `# ${answers.title}      ${this.renderLicenseBadgeWithLink(answers.license)}\r\n`;
-        // add a table of contents at the end after the time
-        let endOfTitlePosition = buffer.length;
-        //  add the description
-        buffer += `# Project Description\r\n${answers.description}\r\n\r\n`;
-        tableOfContentsBuffer += "- [Project Description](#project-description)\r\n";
-        //  add the installation instructions
-        buffer += `# Installation Instructions\r\n\r\n${answers.install}\r\n\r\n`;
-        tableOfContentsBuffer += "- [Installation Instructions](#installation-instructions)\r\n";
-        //  add the usage instructions
-        buffer += `# Usage\r\n\r\n${answers.use}\r\n\r\n`;
-        tableOfContentsBuffer += "- [Usage](#usage)\r\n";
-        //  add the screenshot
-        if (answers.screenshot) {
-            buffer += `# Screenshot\r\n\r\n![screenshot](${answers.screenshot})\r\n\r\n`;
-            tableOfContentsBuffer += "- [Screenshot](#screenshot)\r\n";
-        }
-        //  add the contribution instructions
-        buffer += `## How to contribute\r\n\r\n${answers.contribute}\r\n\r\n`;
-        tableOfContentsBuffer += "- [How To Contribute](#how-to-contribute)\r\n";
-        if (answers.test) {
-            //  add the testing instructions
-            buffer += `# Testing Instructions\r\n\r\n${answers.test}\r\n\r\n`;
-            tableOfContentsBuffer += "- [Testing Instructions](#testing-instructions)\r\n";
-        }
-        //  add the technologies used
-        if (answers.technology) {
-            buffer += `# Technology \r\n\r\n ${answers.technology} \r\n\r\n`;
-            tableOfContentsBuffer += "- [Technology](#technology)\r\n";
-        }
-        //  add the question instructions
-        buffer += `# Questions\r\n\r\n>  **Direct your questions about this project to:**\r\n>\r\n>  *GitHub:* [Github Project Link](https://github.com/${answers.username}/${answers.project})\r\n>\r\n>  *Email:* [${answers.email}](mailto:${answers.email})\r\n\r\n`;
-        tableOfContentsBuffer += "- [Questions](#questions)\r\n";
-        //  add the license attribution text
-        buffer += `# License\r\n\r\n${this.renderLicenseAttribution(answers.license)}`;
-        tableOfContentsBuffer += "- [License](#license)\r\n\r\n";
-
-        // add the TOC to the buffer in the correct location
-        let beforeTOC = buffer.substr(0,endOfTitlePosition);
-        let afterTOC = buffer.substr(endOfTitlePosition);
-
-        let markdown = beforeTOC + tableOfContentsBuffer + afterTOC;
-        if (this.showLog) console.log(markdown);
-        return markdown;
+        let pageRenderer = new PageRenderer(employees);
+        return pageRenderer.render();
     }
 
-    renderLicenseBadgeWithLink(license) {
-        switch(license) {
-            case "apache-2.0": return "[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)";
-            case "cc": return "[![License: CC0-1.0](https://licensebuttons.net/l/zero/1.0/80x15.png)](http://creativecommons.org/publicdomain/zero/1.0/)";
-            case "wtfpl": return "[![License: WTFPL](https://img.shields.io/badge/License-WTFPL-brightgreen.svg)](http://www.wtfpl.net/about/)";
-            case "gpl-3.0": return "[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)";
-            case "unlicense": return "[![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](http://unlicense.org/)";
-            case "mit": return "[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)";
-            case "none": return "";
-
-        }
-    }
-
-    renderLicenseAttribution(license) {
-        switch(license) {
-            case "apache-2.0": return "### [Apache 2.0 License](https://opensource.org/licenses/Apache-2.0)\r\nA permissive license whose main conditions require preservation of copyright and license notices. Contributors provide an express grant of patent rights. Licensed works, modifications, and larger works may be distributed under different terms and without source code.";
-            case "cc": return "### [The Creative Commons CC0 Public Domain Dedication](http://creativecommons.org/publicdomain/zero/1.0/) \r\nWaives copyright interest in a work you've created and dedicates it to the world-wide public domain. Use CC0 to opt out of copyright entirely and ensure your work has the widest reach. As with the Unlicense and typical software licenses, CC0 disclaims warranties. CC0 is very similar to the Unlicense.";
-            case "wtfpl": return "### [The Do What The F*uck You Want License](http://www.wtfpl.net/about/)\r\nEveryone is permitted to copy and distribute verbatim or modified copies of this license document, and changing it is allowed as long as the name is changed."
-            case "gpl-3.0": return "### [Gnu Public License 3.0](https://www.gnu.org/licenses/gpl-3.0)\r\nPermissions of this strong copyleft license are conditioned on making available complete source code of licensed works and modifications, which include larger works using a licensed work, under the same license. Copyright and license notices must be preserved. Contributors provide an express grant of patent rights.";
-            case "unlicense": return "### [Unlicense](http://unlicense.org/)\r\nA license with no conditions whatsoever which dedicates works to the public domain. Unlicensed works, modifications, and larger works may be distributed under different terms and without source code.";
-            case "mit": return "### [MIT License](https://opensource.org/licenses/MIT)\r\nA short and simple permissive license with conditions only requiring preservation of copyright and license notices. Licensed works, modifications, and larger works may be distributed under different terms and without source code.";
-            case "none": return "No license selected.";
-
-        }
-
-    }
 }
 
 
@@ -123,8 +56,13 @@ class Validator {
             console.log(userInput);
             console.log(answersHash);
         }
-        return /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()\.,;\s@\"]+\.{0,1})+([^<>()\.,;:\s@\"]{2,}|[\d\.]+))$/.test(userInput);
+        let isEmail = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()\.,;\s@\"]+\.{0,1})+([^<>()\.,;:\s@\"]{2,}|[\d\.]+))$/.test(userInput);
+        if (!isEmail) {
+            return "Not a valid email address";
+        }
+        return isEmail;
     }
+
 }
 
 class Filter {
@@ -150,6 +88,7 @@ class Transformer {
 
         this.defaultTransformer = this.defaultTransformer.bind(this);
         this.gitHubPrefix = this.gitHubPrefix.bind(this);
+        this.onlyAllowNumbers = this.onlyAllowNumbers.bind(this);
     }
 
     defaultTransformer(userInput, answersHash, options) {
@@ -170,6 +109,16 @@ class Transformer {
             console.log(options);
         }
         return "https://github.com/" + userInput;
+    }
+
+    onlyAllowNumbers(userInput, answersHash, options) {
+        if (this.showLog) {
+            console.log("Transformer: onlyAllowNumbers");
+            console.log(userInput);
+            console.log(answersHash);
+            console.log(options);
+        }
+        return userInput.replace(/[^0-9]/g, '').trim();
     }
 }
 
@@ -196,26 +145,46 @@ class When {
         }
         return false;
     }
+
 }
 
 
-class ReadmeGenerator {
+class TeamProfileGenerator {
     constructor(showDebugOutput = false) {
         this.validator = new Validator(showDebugOutput);
         this.filter = new Filter(showDebugOutput);
         this.transformer = new Transformer(showDebugOutput);
         this.when = new When(showDebugOutput);
+        this.renderer = new HTMLRenderer(showDebugOutput);
 
-        this.renderer = new MarkdownRenderer(showDebugOutput);
+        this.isManager = this.isManager.bind(this);
+        this.isEngineer = this.isEngineer.bind(this);
+        this.isIntern = this.isIntern.bind(this);
+
+        this.employeeType = "manager";
     }
 
+    isManager(answersHash) {
+        return (this.employeeType === "manager");
+    }
+
+    isEngineer(answersHash) {
+        return (this.employeeType === "engineer");
+    }
+
+    isIntern(answersHash) {
+        return (this.employeeType === "intern");
+    }
+
+
     init() {
-        this.questions = [
+
+        this.employeeQuestions = [
             {
-                name: "title",
+                name: "name",
                 type: "input",
-                message: "Please provide a title for the project:",
-                default: "My Project",
+                message: "Please provide a name for the Employee:",
+                default: "Name",
                 validate: this.validator.ensureNotEmptyString,
                 filter: this.filter.defaultFilter,
                 transformer: this.transformer.defaultTransformer,
@@ -225,112 +194,53 @@ class ReadmeGenerator {
                 loop: true,
             },
             {
-                name: "description",
+                name: "id",
                 type: "input",
-                message: "Please provide a description for the project:",
-                default: "My Project Description",
+                message: "Please the id for the Employee:",
+                default: "1",
+                validate: this.validator.ensureNotEmptyString,
+                filter: this.filter.defaultFilter,
+                transformer: this.transformer.onlyAllowNumbers,
+                when: this.when.isMandatoryQuestion,
+                pageSize: 10,
+                askAnswered: true,
+                loop: true,
+            },
+            {
+                name: "email",
+                type: "input",
+                message: "Email address:",
+                default: "Email",
+                validate: this.validator.isEmailAddress,
+                filter: this.filter.defaultFilter,
+                transformer: this.transformer.defaultTransformer,
+                when: this.when.isMandatoryQuestion,
+                //pageSize: 10,
+                askAnswered: true,
+                loop: true,
+            },
+            {
+                name: "officeNumber",
+                type: "input",
+                message: "Please the office number for the Employee:",
+                default: "1",
+                validate: this.validator.ensureNotEmptyString,
+                filter: this.filter.defaultFilter,
+                transformer: this.transformer.onlyAllowNumbers,
+                when: this.isManager,
+                pageSize: 10,
+                askAnswered: true,
+                loop: true,
+            },
+            {
+                name: "school",
+                type: "input",
+                message: "Please provide a school name for the Employee:",
+                default: "School",
                 validate: this.validator.ensureNotEmptyString,
                 filter: this.filter.defaultFilter,
                 transformer: this.transformer.defaultTransformer,
-                when: this.when.isMandatoryQuestion,
-                pageSize: 10,
-                askAnswered: true,
-                loop: true,
-            },
-            {
-                name: "install",
-                type: "editor",
-                message: "Please provide a list of installation instructions for the project:",
-                default: "1.  Install `npm install` 2. Step 2",
-                validate: this.validator.ensureNotEmptyString,
-                filter: this.filter.defaultFilter,
-                transformer: this.transformer.defaultTransformer,
-                when: this.when.isMandatoryQuestion,
-                pageSize: 10,
-                askAnswered: true,
-                loop: true,
-            },
-            {
-                name: "use",
-                type: "editor",
-                message: "Please provide a list of how-to use the project:",
-                default:"How to use",
-                validate: this.validator.ensureNotEmptyString,
-                filter: this.filter.defaultFilter,
-                transformer: this.transformer.defaultTransformer,
-                when: this.when.isMandatoryQuestion,
-                pageSize: 10,
-                askAnswered: true,
-                loop: true,
-            },
-            {
-                name: "contribute",
-                type: "input",
-                message: "How should people contribute to the project:",
-                default: "How to contribute",
-                validate: this.validator.canBeEmptyString,
-                filter: this.filter.defaultFilter,
-                transformer: this.transformer.defaultTransformer,
-                when: this.when.isMandatoryQuestion,
-                pageSize: 10,
-                askAnswered: true,
-                loop: true,
-            },
-            {
-                name: "test",
-                type: "input",
-                message: "How should people test the project:",
-                default: "How to run the tests (if any)",
-                validate: this.validator.canBeEmptyString,
-                filter: this.filter.defaultFilter,
-                transformer: this.transformer.defaultTransformer,
-                when: this.when.isMandatoryQuestion,
-                pageSize: 10,
-                askAnswered: true,
-                loop: true,
-            },
-            {
-                name: "license",
-                type: "list",
-                message: "What is the license for the project:",
-                choices: [
-                    {
-                        name: "Apache 2.0 License",
-                        value: "apache-2.0",
-                        short: "apache2"
-                    },
-                    {
-                        name: "Creative Commons license family",
-                        value: "cc",
-                        short: "CC"
-                    },
-                    {
-                        name: "MIT",
-                        value: "mit",
-                        short: "MIT"
-                    },
-                    {
-                        name: "Do What The F*ck You Want To Public License",
-                        value: "wtfpl",
-                        short: "WTFPL"
-                    },
-                    {
-                        name: "GNU General Public License v3.0",
-                        value: "gpl-3.0",
-                        short: "GPL3"
-                    },
-                    {
-                        name: "The Unlicense",
-                        value: "unlicense",
-                        short: "unlicense"
-                    },
-                    {
-                        name: "None",
-                        value: "none",
-                        short: "none"
-                    },
-                ],
-                when: this.when.isMandatoryQuestion,
+                when: this.isIntern,
                 pageSize: 10,
                 askAnswered: true,
                 loop: true,
@@ -343,118 +253,146 @@ class ReadmeGenerator {
                 validate: this.validator.ensureNotEmptyString,
                 filter: this.filter.defaultFilter,
                 transformer: this.transformer.defaultTransformer,
-                when: this.when.isMandatoryQuestion,
-                pageSize: 10,
-                askAnswered: true,
-                loop: true,
-            },
-            {
-                name: "project",
-                type: "input",
-                message: "GitHub Project Name:",
-                default: "mygithubproject",
-                validate: this.validator.ensureNotEmptyString,
-                filter: this.filter.defaultFilter,
-                transformer: this.transformer.defaultTransformer,
-                when: this.when.isMandatoryQuestion,
-                pageSize: 10,
-                askAnswered: true,
-                loop: true,
-            },
-            {
-                name: "email",
-                type: "input",
-                message: "Email address:",
-                default: "My email",
-                validate: this.validator.isEmailAddress,
-                filter: this.filter.defaultFilter,
-                transformer: this.transformer.defaultTransformer,
-                when: this.when.isMandatoryQuestion,
-                //pageSize: 10,
-                askAnswered: true,
-                loop: true,
-            },
-            {
-                name: "technology",
-                type: "editor",
-                message: "List of technologies used:",
-                default: "1. Technology 1",
-                validate: this.validator.ensureNotEmptyString,
-                filter: this.filter.defaultFilter,
-                transformer: this.transformer.defaultTransformer,
-                when: this.when.isMandatoryQuestion,
-                askAnswered: true,
-                loop: true,
-            },
-            {
-                name: "screenshot",
-                type: "input",
-                message: "Location and name of screenshot",
-                default: "./assets/img/screenshot.png",
-                validate: this.validator.ensureNotEmptyString,
-                filter: this.filter.defaultFilter,
-                transformer: this.transformer.defaultTransformer,
-                when: this.when.isMandatoryQuestion,
-                askAnswered: true,
-                loop: true,
-            },
-            {
-                name: "filename",
-                type: "input",
-                message: "What filename should we output the readme markdown?",
-                default: "README.md",
-                validate: this.validator.ensureNotEmptyString,
-                filter: this.filter.defaultFilter,
-                transformer: this.transformer.defaultTransformer,
-                when: this.when.isMandatoryQuestion,
+                when: this.isEngineer,
                 pageSize: 10,
                 askAnswered: true,
                 loop: true,
             },
         ];
+
+
+        this.choiceMenu = [
+            {
+                name: "type",
+                type: "list",
+                message: "What you like to do:",
+                choices: [
+                    {
+                        name: "Add Engineer",
+                        value: "engineer",
+                        short: "engineer"
+                    },
+                    {
+                        name: "Add Intern",
+                        value: "intern",
+                        short: "intern"
+                    },
+                    {
+                        name: "Have finished entering the team details",
+                        value: "finished",
+                        short: "finished"
+                    },
+                ],
+            }
+        ];
     }
 
-    start() {
-        inquirer
-            .prompt(this.questions)
+    convertAnswersToEmployee(employeeType, answers) {
+        let employee = null;
+        switch (employeeType) {
+            case "manager": {
+                employee = new Manager();
+                employee.setOfficeNumber(parseInt(answers.officeNumber));
+                break;
+            }
+            case "engineer": {
+                employee = new Engineer();
+                employee.setGitHubUsername(answers.username);
+                break;
+            }
+            case "intern": {
+                employee = new Intern();
+                employee.setSchool(answers.school);
+                break;
+            }
+        }
+        employee.setId(parseInt(answers.id));
+        employee.setName(answers.name);
+        employee.setEmail(answers.email);
+
+
+        return employee;
+    }
+
+    askForNextEmployee(employees) {
+        inquirer.prompt(this.choiceMenu)
             .then((answers) => {
-                let markdown = this.renderer.render(answers);
-                this.writeToFile(answers.filename, markdown);
+                // if the chose finished, we are done
+                if (answers.type !== "finished") {
+                    this.employeeType = answers.type;
+                    inquirer.prompt(this.employeeQuestions, {
+                        type: answers.type,
+                    })
+                        .then((answers) => {
+                            let employee = this.convertAnswersToEmployee(this.employeeType,answers);
+                            employees.push(employee);
+                            this.askForNextEmployee(employees);
+                            // write to the file
+                            let render = new HTMLRenderer(this.showLog);
+                            let html = render.render(employees);
+                            this.writeToFile("./dist/index.html",html);
+
+                        })
+                        .catch((error) => {
+                            if (error.isTtyError) {
+                                // Prompt couldn't be rendered in the current environment
+                                console.log("Must be running in a terminal/command window.");
+                            } else {
+                                console.log(error);
+                                console.log("Unknown error occurred.")
+                            }
+
+                        });
+                }
             })
             .catch((error) => {
                 if (error.isTtyError) {
                     // Prompt couldn't be rendered in the current environment
                     console.log("Must be running in a terminal/command window.");
                 } else {
+                    console.log(error);
                     console.log("Unknown error occurred.")
                 }
-            });
+
+            })
+    }
+
+
+    start() {
+        // start with asking question for the team manager
+        let employees = [];
+        this.employeeType = "manager";
+        inquirer.prompt(this.employeeQuestions)
+            .then((answers) => {
+                // convert the answers to an employee
+                let employee = this.convertAnswersToEmployee(this.employeeType, answers);
+                employees.push(employee);
+                // ok, now we can build the team - looping and asking the user each time
+                this.askForNextEmployee(employees);
+
+            })
+            .catch((error) => {
+                if (error.isTtyError) {
+                    // Prompt couldn't be rendered in the current environment
+                    console.log("Must be running in a terminal/command window.");
+                } else {
+                    console.log(error);
+                    console.log("Unknown error occurred.")
+                }
+            })
     }
 
     writeToFile(filename, data) {
         console.log(`Writing to file ${filename}`);
         // check to see if the file already exist
-        fs.access(filename,fs.constants.F_OK, (err) => {
-           let newFileName = filename;
-           if (!err) {
-               // file already exists
-               // append a date and time to give it a unique name
-               let filenameParts = filename.split(".");
-               let now = moment().format("YYYYMMDDHHmmss");
-               newFileName = filenameParts[0] + now + ".md";
-               console.log(`${filename} already exists, writing data to ${newFileName}`);
-           }
-
-           let markdownFile = fs.createWriteStream(newFileName, {flags: 'w'});
-           markdownFile.write(data);
-           markdownFile.close();
-
-        });
+        let markdownFile = fs.createWriteStream(filename, {flags: 'w'});
+        markdownFile.write(data);
+        markdownFile.close();
     }
 }
 
 let showDebugOutput = false;
 
-let generator = new ReadmeGenerator(showDebugOutput);
+let generator = new TeamProfileGenerator(showDebugOutput);
 generator.init();
 generator.start();

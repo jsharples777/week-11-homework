@@ -15,4 +15,12 @@ export class Intern extends Employee {
     public setSchool(school:string) {
         this.school = school;
     }
+
+    public getSubTypeAttributeName(): string {
+        return "School";
+    }
+
+    public getSubTypeAttributeValue(): string {
+        return this.getSchool();
+    }
 }

@@ -5,8 +5,13 @@ export enum employeeTypes {
     Intern
 }
 
+export interface EmployeeSubType {
+    getSubTypeAttributeName():string;
+    getSubTypeAttributeValue():string;
+}
 
-export class Employee {
+
+export class Employee implements EmployeeSubType {
     protected id: number;
     protected name: string;
     protected email: string;
@@ -60,5 +65,13 @@ export class Employee {
 
     public getEmail():string {
         return this.email;
+    }
+
+    public getSubTypeAttributeName(): string {
+        return "";
+    }
+
+    public getSubTypeAttributeValue(): string {
+        return "";
     }
 }

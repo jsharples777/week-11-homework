@@ -16,4 +16,12 @@ export class Engineer extends Employee {
         this.gitHubUsername = name;
     }
 
+    public getSubTypeAttributeName(): string {
+        return "GitHub";
+    }
+
+    public getSubTypeAttributeValue(): string {
+        return this.getGitHubUsername();
+    }
+
 }

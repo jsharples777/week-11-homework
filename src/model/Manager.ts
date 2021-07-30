@@ -15,4 +15,12 @@ export class Manager extends Employee {
     public getOfficeNumber():number {
         return this.officeNumber;
     }
+
+    public getSubTypeAttributeName(): string {
+        return "Office Number";
+    }
+
+    public getSubTypeAttributeValue(): string {
+        return "" + this.getOfficeNumber();
+    }
 }
