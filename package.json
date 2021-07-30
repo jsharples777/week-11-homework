@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "compile": "./node_modules/.bin/tsc"
+    "tsc": "tsc",
+    "watch": "babel --verbose --watch src --out-dir lib --extensions '.ts,.tsx'",
+    "build": "babel src --out-dir lib --extensions '.ts,.tsx'",
+    "test": "jest"
   },
   "author": "Jim Sharples",
   "license": "ISC",
@@ -14,10 +17,15 @@
     "moment": "^2.29.1"
   },
   "devDependencies": {
+    "@babel/cli": "^7.14.8",
+    "@babel/core": "^7.14.8",
+    "@babel/preset-env": "^7.14.8",
+    "@babel/preset-typescript": "^7.14.5",
     "@types/inquirer": "^7.3.3",
     "@types/jest": "^26.0.24",
     "@types/node": "^16.4.7",
     "jest": "^27.0.6",
+    "ts-jest": "^27.0.4",
     "tslint": "^6.1.3",
     "typescript": "^4.3.5"
   }

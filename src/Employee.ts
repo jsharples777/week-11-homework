@@ -6,13 +6,13 @@ export enum employeeTypes {
 }
 
 
-export abstract class Employee {
+export class Employee {
     protected id: number;
     protected name: string;
     protected email: string;
     protected role: employeeTypes;
 
-    protected constructor() {
+    constructor() {
         this.email = "";
         this.id = -1;
         this.name = "";
@@ -52,5 +52,13 @@ export abstract class Employee {
             default:
                 return "Unknown";
         }
+    }
+
+    public setEmail(email:string) {
+        this.email = email;
+    }
+
+    public getEmail():string {
+        return this.email;
     }
 }
