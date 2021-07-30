@@ -67,7 +67,7 @@ Please access the [Questions](#questions) section to send me an email, or access
 
 >  **Direct your questions about this project to:**
 >
->  *GitHub:* [Github Project Link](https://github.com/jsharples777/week-10-homework)
+>  *GitHub:* [Github Project Link](https://github.com/jsharples777/week-11-homework)
 >
 >  *Email:* [jamie.sharples@gmail.com](mailto:jamie.sharples@gmail.com)
 
