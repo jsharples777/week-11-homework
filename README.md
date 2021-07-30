@@ -36,9 +36,9 @@ To execute the application, use a command line interface (CLI) such as terminal 
 
 # Walkthrough Video
 
-1.  Unit Testing  ![walkthrough part 1](https://drive.google.com/file/d/1-oK6Xb5BSsQx2W11IBQ1Cy3Dvn80cxBB/view)
-2.  Team Profile Generation Process ![walkthrough part 2](https://drive.google.com/file/d/1m9UDnPNW076lJxg8-3GgiFK9iNss1f1f/view)
-3.  Team Profile Page (that was generated in step two) ![walkthrough part 3](https://drive.google.com/file/d/1WKsoUJymRndscLCjkvQJNJyVkWHgBBYx/view)
+1.  Unit Testing  [walkthrough part 1](https://drive.google.com/file/d/1-oK6Xb5BSsQx2W11IBQ1Cy3Dvn80cxBB/view)
+2.  Team Profile Generation Process [walkthrough part 2](https://drive.google.com/file/d/1m9UDnPNW076lJxg8-3GgiFK9iNss1f1f/view)
+3.  Team Profile Page (that was generated in step two) [walkthrough part 3](https://drive.google.com/file/d/1WKsoUJymRndscLCjkvQJNJyVkWHgBBYx/view)
 
 ## How to contribute
 
